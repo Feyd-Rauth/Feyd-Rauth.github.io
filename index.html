@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Web 3 Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" type="text/css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js'></script>
+</head>
+
+<body>
+
+    Simple calculator
+    <br >
+    x: <input id="x" type="number"> <br >
+    y: <input id="y" type="number"> <br >
+    operation: 
+    <select name="method" id="method"> 
+        <option value="add">add</option>
+        <option value="sub">sub</option>
+        <option value="mul">mul</option>
+        <option value="div">div</option>
+      </select>
+
+    <button onclick="calc();">Calculate</button>
+
+
+    <br /><br />
+    Result: <span id="status"></span>
+
+    <script type="text/javascript">
+        async function loadWeb3() {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                window.ethereum.enable();
+            }
+        }
+
+        async function load() {
+            await loadWeb3();
+            window.contract = await loadContract();
+            updateStatus('Ready!');
+        }
+
+        function updateStatus(status) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = status;
+            console.log(status);
+        }
+
+        async function getCurrentAccount() {
+            const accounts = await window.web3.eth.getAccounts();
+            return accounts[0];
+        }
+
+        async function loadContract() {
+            return await new window.web3.eth.Contract([
+                {
+                    "inputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "x",
+                            "type": "int256"
+                        },
+                        {
+                            "internalType": "int256",
+                            "name": "y",
+                            "type": "int256"
+                        }
+                    ],
+                    "name": "add",
+                    "outputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "z",
+                            "type": "int256"
+                        }
+                    ],
+                    "stateMutability": "pure",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "x",
+                            "type": "int256"
+                        },
+                        {
+                            "internalType": "int256",
+                            "name": "y",
+                            "type": "int256"
+                        }
+                    ],
+                    "name": "div",
+                    "outputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "z",
+                            "type": "int256"
+                        }
+                    ],
+                    "stateMutability": "pure",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "x",
+                            "type": "int256"
+                        },
+                        {
+                            "internalType": "int256",
+                            "name": "y",
+                            "type": "int256"
+                        }
+                    ],
+                    "name": "mul",
+                    "outputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "z",
+                            "type": "int256"
+                        }
+                    ],
+                    "stateMutability": "pure",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "x",
+                            "type": "int256"
+                        },
+                        {
+                            "internalType": "int256",
+                            "name": "y",
+                            "type": "int256"
+                        }
+                    ],
+                    "name": "sub",
+                    "outputs": [
+                        {
+                            "internalType": "int256",
+                            "name": "z",
+                            "type": "int256"
+                        }
+                    ],
+                    "stateMutability": "pure",
+                    "type": "function"
+                }
+            ], '0xC94B8d1b175558fE6B31d7803dce2b5c95bD4941');
+        }
+
+
+        async function calc() {
+            let method_name = document.getElementById('method').value
+            let method = window.contract.methods[method_name]
+
+            const x = document.getElementById("x").value;
+            const y = document.getElementById("y").value;
+
+            let result = await method(x, y).call()
+
+            updateStatus(result);
+        }
+
+
+        load();
+    </script>
+</body>
+
+</html>
